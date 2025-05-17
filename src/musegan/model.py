@@ -2,6 +2,7 @@
 import os.path
 import logging
 import imageio
+import cv2
 import numpy as np
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
@@ -269,7 +270,8 @@ class Model:
                 def _save_image_grid(array, suffix, name):
                     image = image_grid(array, config['image_grid'])
                     filepath = _get_filepath('images', name, suffix, 'png')
-                    imageio.imwrite(filepath, image)
+                    #imageio.imwrite(filepath, image)
+                    cv2.imwrite(filepath, image)
                     return np.array([0], np.int32)
 
                 def _save_images(array, suffix, name):
