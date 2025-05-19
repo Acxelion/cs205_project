@@ -1,7 +1,9 @@
 """Operations for implementing binary neurons. Code is from the R2RT blog post:
 https://r2rt.com/binary-stochastic-neurons-in-tensorflow.html (slightly adapted)
 """
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+
 from tensorflow.python.framework import ops
 
 def binary_round(x):
