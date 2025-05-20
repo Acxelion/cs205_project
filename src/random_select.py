@@ -49,7 +49,7 @@ def parse_arguments():
     )
     parser.add_argument(
         "-o",
-        "--output_filename",
+        "--outfile",
         type=Path,
         required=True,
         help="output filename",
@@ -103,8 +103,8 @@ def check_which_family(track):
 
 
 def segment_quality(pianoroll, threshold_pitch, threshold_beats):
-    pitch_sum = np.sum(np.sum(pianoroll.pianoroll, axis=0) > 0)
-    beat_sum = np.sum(np.sum(pianoroll.pianoroll, axis=1) > 0)
+    pitch_sum = np.sum(np.sum(pianoroll, axis=0) > 0)
+    beat_sum = np.sum(np.sum(pianoroll, axis=1) > 0)
     return (
         (pitch_sum >= threshold_pitch) and (beat_sum >= threshold_beats),
         (pitch_sum, beat_sum),
@@ -153,8 +153,7 @@ def main():
         print(f"Processing {filename}")
         song_dir = args.input_dir / msd_id_to_dirs(filename)
         multitrack = pypianoroll.load(song_dir / os.listdir(song_dir)[0])
-        print(multitrack)
-        print(multitrack.downbeat)
+        # print(multitrack)
         print(filename)
         downbeat = multitrack.downbeat
 
@@ -185,6 +184,7 @@ def main():
                 family = in_family[0]
 
                 tmp_pianoroll = track[st:ed:down_sample]
+                # print(tmp_pianoroll.shape)
                 is_ok, score = segment_quality(
                     tmp_pianoroll,
                     FAMILY_THRESHOLDS[family][0],
@@ -198,7 +198,8 @@ def main():
 
             hop_iter = np.random.randint(0, 1) + hop_size
             song_ok_segments.append(
-                Multitrack(tracks=best_instr, beat_resolution=12)
+                # edited "beat_resolution" to "resolution"
+                Multitrack(tracks=best_instr, resolution=12)
             )
 
         count_ok_segment = len(song_ok_segments)
@@ -230,7 +231,7 @@ def main():
         pianorolls = []
 
         for tracks in multi_track.tracks:
-            pianorolls.append(tracks.pianoroll[:, :, np.newaxis])
+            pianorolls.append(tracks[:, :, np.newaxis]) # changed "tracks.pianoroll" to "tracks"
 
         pianoroll_compiled = np.reshape(
             np.concatenate(pianorolls, axis=2)[:, 24:108, :],
@@ -241,7 +242,7 @@ def main():
 
     result = np.concatenate(compiled_list, axis=0)
     print(f"output shape: {result.shape}")
-    if args.outfile.endswith(".npz"):
+    if False: # args.outfile.endswith(".npz"):
         np.savez_compressed(
             args.outfile,
             nonzero=np.array(result.nonzero()),
