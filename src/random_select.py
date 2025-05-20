@@ -4,12 +4,12 @@ from pathlib import Path
 
 import numpy as np
 from pypianoroll import Multitrack, Track
+import pypianoroll
 
 # added imports
 import os
 import os.path
 import random
-from tqdm imprt tqdm # delete if causes issues, only for QoL
 
 FAMILY_NAMES = [
     "drum",
@@ -123,6 +123,8 @@ def select_random(dataset_root: str, id_dir: str, k: int):
     for path in os.listdir(id_dir):
         filepath = os.path.join(id_dir, path)
         if os.path.isfile(filepath):
+            if("masd_labels.txt" in filepath or "masd_labels_cleansed.txt" in filepath):
+              continue
             with open(filepath) as f:
                 id_list.extend([line.rstrip() for line in f])
     id_list = list(set(id_list))
@@ -145,10 +147,15 @@ def main():
 #    else:
 #        filenames = args.input_dir.glob("*.npz")
     filenames = select_random(args.input_dir, args.label_dir, args.count)
+    print(filenames)
 
-    for filename in tqdm(filenames):
+    for filename in filenames:
         print(f"Processing {filename}")
-        multitrack = Multitrack(filename)
+        song_dir = args.input_dir / msd_id_to_dirs(filename)
+        multitrack = pypianoroll.load(song_dir / os.listdir(song_dir)[0])
+        print(multitrack)
+        print(multitrack.downbeat)
+        print(filename)
         downbeat = multitrack.downbeat
 
         num_bar = len(downbeat) // resolution
