@@ -5,7 +5,7 @@ import logging
 import argparse
 from pprint import pformat
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from musegan.config import LOGLEVEL, LOG_FORMAT
 from musegan.data import load_data
 from musegan.model import Model

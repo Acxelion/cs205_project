@@ -85,7 +85,7 @@ def main():
         song_dir = args.input_dir / msd_id_to_dirs(f)
 
         # execute script
-        os.system("python3.7 ../src/collect_data_npz.py -i \'{readFromDir}\' -o \'{output_name}\'".format(
+        os.system("python3.7 /content/cs205_project/src/collect_data_npz.py -i \'{readFromDir}\' -o \'{output_name}\'".format(
             readFromDir = str(song_dir),
             output_name = "./data/test" + "/test{n}.npy".format(n=i)))
 

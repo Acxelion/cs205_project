@@ -134,8 +134,8 @@ def main():
         filenames = args.input_dir.glob("*.npz")
 
     for filename in filenames:
-        print(f"Processing {filename}")
-        multitrack = Multitrack(filename)
+        print(f"Processing {filename}", end=" \n")
+        multitrack = pypianoroll.load(filename)
         downbeat = multitrack.downbeat
 
         num_bar = len(downbeat) // resolution
