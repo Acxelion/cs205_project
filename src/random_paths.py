@@ -82,12 +82,52 @@ def main():
         os.mkdir("./data/test")
 
     filepaths = []
-    for i,f in enumerate(filenames):
-        # get path to folder containing the .npz Multitrack
-        song_dir = args.input_dir / msd_id_to_dirs(f)
+    # for i,f in enumerate(filenames):
+    #     # get path to folder containing the .npz Multitrack
+    #     song_dir = args.input_dir / msd_id_to_dirs(f)
+    #     _path = list(song_dir.glob("*.npz"))[0]
 
-        if pypianoroll.load(song_dir[0]).shape == (5,6000,128):
-          filepaths.append(song_dir)
+    #     # transform multitrack file for comparison
+    #     multitrack = pypianoroll.load(_path)
+    #     tracks = [track.pianoroll for track in multitrack.tracks]
+        
+    #     #if(any([t.shape[0] == 0 for t in tracks])):
+    #     #  continue
+        
+    #     print([t.shape for t in tracks])
+    #     print([t.shape[0] == 0 for t in tracks], end="\n\n")
+    #     pianoroll_data = np.stack(tracks, axis=0)
+
+    #     if pianoroll_data.shape == (5,6000,128): #multitrack.stack().shape == (5,6000,128):
+    #       filepaths.append(_path)
+
+    for i, f in enumerate(filenames):
+      song_dir = args.input_dir / msd_id_to_dirs(f)
+      npz_files = list(song_dir.glob("*.npz"))
+      if not npz_files:
+          print(f"No .npz found for {f} in {song_dir}")
+          continue
+      _path = npz_files[0]
+      try:
+          multitrack = pypianoroll.load(_path)
+          tracks = [track.pianoroll for track in multitrack.tracks]
+          shapes = [t.shape for t in tracks]
+
+          if any(t.shape[0] == 0 for t in tracks):
+              print(f"Skipping {f}: At least one track is empty. Shapes: {shapes}")
+              continue
+          if len(set(shapes)) != 1:
+              print(f"Skipping {f}: Not all tracks have the same shape: {shapes}")
+              continue
+
+          pianoroll_data = np.stack(tracks, axis=0)
+          if pianoroll_data.shape == (5, 6000, 128):
+              filepaths.append(str(_path))
+      except Exception as e:
+          print(f"Error loading {f}: {e}")
+
+
+    print(f"Found { len(filepaths) } files.")
 
     with open("./data/paths.npy", 'wb') as f:
       np.save(f, np.array(filepaths))
