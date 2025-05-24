@@ -80,6 +80,9 @@ def main():
 
     print(filenames)
 
+    if not os.path.exists("./data/test"):
+        os.mkdir("./data/test")
+
     for i,f in enumerate(filenames):
         # get path to folder containing the .npz Multitrack
         song_dir = args.input_dir / msd_id_to_dirs(f)
